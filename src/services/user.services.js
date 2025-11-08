@@ -1,5 +1,6 @@
 import ConflictException from "../exceptions/conflict.exception.js";
 import { prisma } from "../models/prismaClient.js";
+import bcrypt from "bcrypt";
 
 const UserServices = () => {
   const createUser = async (userData) => {
@@ -9,9 +10,13 @@ const UserServices = () => {
       throw new ConflictException("User with this email already exists");
     }
 
+    const { password, ...rest } = userData;
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const newUser = await prisma.user.create({
       data: {
         ...userData,
+        password: hashedPassword,
       },
     });
     return newUser;
