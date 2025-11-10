@@ -1,29 +1,22 @@
-import { createUserSchema } from "../validations/users.schema.validation.js";
 import { UserServices } from "../services/user.services.js";
 import { StatusCodes } from "http-status-codes";
+import { MESSAGES } from "../utils/messages.js";
+import { successResponse } from "../utils/responseHandler.js";
 
 const UserController = () => {
   const userServices = UserServices();
 
-  const createUser = async (req, res) => {
-    const { error, value } = createUserSchema.validate(req.body, {
-      abortEarly: false,
-      stripUnknown: true,
-    });
-
-    if (error) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        message: error.details.map((detail) => detail.message),
-      });
-    }
-
+  const createUser = async (req, res, next) => {
     try {
-      const createdUser = await userServices.createUser(value);
-      return res.status(StatusCodes.CREATED).json(createdUser);
+      const createdUser = await userServices.createUser(req.body);
+      return successResponse(
+        res,
+        MESSAGES.USER.CREATED,
+        createdUser,
+        StatusCodes.CREATED
+      );
     } catch (error) {
-      return res
-        .status(error.StatusCodes || StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ message: error.message });
+      next(error);
     }
   };
 

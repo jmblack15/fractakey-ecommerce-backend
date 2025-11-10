@@ -1,9 +1,8 @@
 import { StatusCodes } from "http-status-codes";
+import BaseException from "./base.exception.js";
 
-class ConflictException extends Error {
-  constructor(message) {
-    super(message);
-    this.StatusCodes = StatusCodes.CONFLICT;
+export default class ConflictException extends BaseException {
+  constructor(message = "Conflict", errorCode = "CONFLICT_ERROR") {
+    super(message, StatusCodes.CONFLICT, errorCode);
   }
 }
-export default ConflictException;
